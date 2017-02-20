@@ -2,29 +2,33 @@ var c = document.getElementById("slate");
 var ctx = c.getContext('2d');
 ctx.fillStyle = "#ff80ff";
 var rid;
+var cb = document.getElementById("clear");
+var sb = document.getElementById("stop");
+var circleb = document.getElementById("circle");
+var dvdb = document.getElementById("dvd");
+var dvdimg = document.getElementById("dvdimg");
 
-var button = document.getElementById("clear"); 
-button.addEventListener("click", function(e){
-    console.log("hi");	
-    var ctx = c.getContext('2d');
+//click
+var clear = function(){
     ctx.clearRect(0,0,c.clientWidth,c.clientHeight);
-    });
+}; 
+cb.addEventListener("click", clear);
 
-
+//stop
 var stopIt = function() {
 	window.cancelAnimationFrame(rid);
 };
-
-var sb = document.getElementById("stop");
 sb.addEventListener("click",stopIt);
 
-
-var animateDot = function() {
+//animate circle
+var animateCircle = function() {
 
 	x=0;
+	//so it doesn't accelerate
 	window.cancelAnimationFrame(rid);
 
 	var addCircle = function () {
+		//so it doesn't keep drawing circles on top of each other
 		ctx.clearRect(0,0,c.clientWidth,c.clientHeight);
 		console.log(rid);
 		ctx.beginPath();
@@ -33,45 +37,53 @@ var animateDot = function() {
 		x++;
 		if (x<c.width/2) {
 			rid=window.requestAnimationFrame( addCircle );
-		};
-		//rid=window.requestAnimationFrame( subtractCircle );
-		
+		}
+		else { rid=window.requestAnimationFrame( subtractCircle ); };
 	};
 
 	var subtractCircle = function () {
-		//window.cancelAnimationFrame(rid);
+		ctx.clearRect(0,0,c.clientWidth,c.clientHeight);
+		console.log(rid);
+		ctx.beginPath();
 		ctx.arc(c.width/2,c.height/2,x,0,Math.PI * 2);
 		ctx.fill();
 		x--;
-		if (x>=0) {
+		if (x>0) {
 			rid=window.requestAnimationFrame( subtractCircle );
-		};
+		}
+		else { rid=window.requestAnimationFrame( addCircle ); };
 	};
 
-	addCircle();
-	/*
-		if (x=c.width/2) {
-			subtractCircle();
-		};
-	*/
+	rid=window.requestAnimationFrame( addCircle );
+	console.log("done!");
+};
+circleb.addEventListener("click", animateCircle);
+    
+var animateDvd = function (rid) {
+	window.cancelAnimationFrame(rid);
+
+	x = Math.floor(Math.random() * (c.clientWidth-135));
+	y = Math.floor(Math.random() * (c.clientHeight-78));
+	forwardX = 1;
+	forwardY = 1;
+
+	var moveDvd = function () {
+		window.cancelAnimationFrame(rid);
+		ctx.clearRect(0,0,c.clientWidth, c.clientHeight);
+		console.log("rid"+rid);
+		ctx.drawImage(dvdimg,x,y);
+		ctx.beginPath();
+		ctx.fill();
+		if (x>=c.clientWidth-135 || x<=0){forwardX*=-1;}
+		else if (y>=c.clientWidth-78 || y<=0){forwardY*=-1;};
+		x+=forwardX;
+		y+=forwardY;
+		rid = window.requestAnimationFrame(moveDvd);
+		console.log(x,y);
+	};
+
+	rid = window.requestAnimationFrame(moveDvd);
 	console.log("done!");
 };
 
-
-	var subtractCircle = function () {
-		//window.cancelAnimationFrame(rid);
-		ctx.arc(c.width/2,c.height/2,x,0,Math.PI * 2);
-		ctx.fill();
-		x--;
-		console.log("x="+x);
-		if (x>=0) {
-			rid=window.requestAnimationFrame( subtractCircle );
-		};
-	};
-
-
-
-//rid=window.requestAnimationFrame( drawCircle );
-c.addEventListener("click",animateDot);
-    
-    
+dvdb.addEventListener("click", animateDvd);
