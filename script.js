@@ -68,16 +68,29 @@ var animateDvd = function (rid) {
 	forwardY = 1;
 
 	var moveDvd = function () {
-		window.cancelAnimationFrame(rid);
+		//window.cancelAnimationFrame(rid);
 		ctx.clearRect(0,0,c.clientWidth, c.clientHeight);
 		console.log("rid"+rid);
 		ctx.drawImage(dvdimg,x,y);
 		ctx.beginPath();
 		ctx.fill();
-		if (x>=c.clientWidth-135 || x<=0){forwardX*=-1;}
-		else if (y>=c.clientWidth-78 || y<=0){forwardY*=-1;};
 		x+=forwardX;
 		y+=forwardY;
+		if (x>=c.clientWidth-135 || x<=0){
+			window.cancelAnimationFrame(rid);
+			forwardX*=-1;
+			x+=forwardX;
+			y+=forwardY;
+			rid = window.requestAnimationFrame(moveDvd);
+		}
+		else if (y>=c.clientWidth-78 || y<=0){
+			window.cancelAnimationFrame(rid);
+			forwardY*=-1;
+			x+=forwardX;
+			y+=forwardY;
+			rid = window.requestAnimationFrame(moveDvd);
+		};
+		window.cancelAnimationFrame(rid);
 		rid = window.requestAnimationFrame(moveDvd);
 		console.log(x,y);
 	};
